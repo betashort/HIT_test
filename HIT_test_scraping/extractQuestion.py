@@ -1,3 +1,4 @@
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -6,7 +7,7 @@ import re
 import json
 import time
 
-def extractQuestion(url):
+def extractQuestion(url, folder_path):
     # Chrome
     options = Options()
     options.add_argument('--headless')
@@ -23,7 +24,7 @@ def extractQuestion(url):
     
     answer = getAnswer(driver)
     
-    saveJson(question_num, question, select_text_list, answer)
+    saveJson(folder_path, question_num, question, select_text_list, answer)
     
     # ブラウザを閉じる
     driver.quit()
@@ -36,6 +37,7 @@ def getQuestion(driver):
     question = elements.text
     pattern = r"^問\d+"
     question_num = re.findall(pattern, question)[0]
+    question_num = re.sub("問", "question_", question_num)
     question = re.sub(pattern, "", question)
     
     return question_num, question
@@ -53,7 +55,6 @@ def getSelectText(driver):
                 select_text = re.sub(pattern, "", el.text)
                 select_text = re.sub("　", " ", select_text) 
                 select_text_list.append(select_text)
-    print(select_text_list)
     return select_text_list
 
 def getAnswer(driver):
@@ -71,14 +72,14 @@ def getAnswer(driver):
             
     return answer
 
-def saveJson(question_num, question, select_text_list, answer):
+def saveJson(folder_path, question_num, question, select_text_list, answer):
     question_json = {
         "question": question,
         "select_text_list": select_text_list,
         "answer": answer
     }
     
-    with open('test.json', 'w', encoding="utf-8") as f:
+    with open(f'{folder_path}/{question_num}.json', 'w', encoding="utf-8") as f:
         json.dump(question_json, f, ensure_ascii=False)
     
     
