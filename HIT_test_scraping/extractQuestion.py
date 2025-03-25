@@ -35,15 +35,20 @@ def getQuestion(driver):
     ## 問題文を取得
     elements = driver.find_element(By.XPATH, '//div[@class="user_body"]/div/span')
     question = elements.text
-    pattern = r"^問\d+"
-    question_num = re.findall(pattern, question)[0]
+    extract_question_num_pattern = r"^問\d+"
+    exclude_question_pattern = r"^問\d+$"
+    question_num = re.findall(extract_question_num_pattern, question)[0]
     question_num = re.sub("問", "question_", question_num)
-    question = re.sub(pattern, "", question)
+    if re.fullmatch(exclude_question_pattern, question):
+        elements = driver.find_elements(By.XPATH, '//div[@class="user_body"]/div')
+        question = elements[1].text
+    else:
+        question = re.sub(extract_question_num_pattern, "", question)
     
     return question_num, question
 
 def getSelectText(driver):
-    pattern = r"\d+\)　"
+    pattern = r"^\d+\)"
     ## 選択肢を取得
     elements = driver.find_elements(By.XPATH, '//div[@class="user_body"]/div')
     select_text_list = []
@@ -52,8 +57,8 @@ def getSelectText(driver):
             if re.search("解答", el.text):
                 break
             else:
-                select_text = re.sub(pattern, "", el.text)
-                select_text = re.sub("　", " ", select_text) 
+                select_text = re.sub("　", " ", el.text) 
+                select_text = re.sub(" ", "", select_text) 
                 select_text_list.append(select_text)
     return select_text_list
 
@@ -67,6 +72,7 @@ def getAnswer(driver):
         if re.search(pattern, el_text):
             answer = el.text
             answer = re.sub(pattern, "", answer)
+            answer = re.sub("【", "", answer)
             answer = re.sub("　", "", answer)
             break
             

@@ -35,9 +35,11 @@ def createFolder(driver):
     category = title.split(">")[1].strip()
     
     if os.path.exists(f"{year}") == False:
+        print(f"create folder: {year}")
         os.mkdir(f"{year}")
-        if os.path.exists(f"{year}/{category}") == False:
-            os.mkdir(f"{year}/{category}")
+    if os.path.exists(f"{year}/{category}") == False:
+        print(f"create folder: {year}/{category}")
+        os.mkdir(f"{year}/{category}")
     
     folder_path = f"{year}/{category}"
     return folder_path
