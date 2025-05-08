@@ -1,9 +1,15 @@
 version: '3'
 services:
   node:
-    build: ./docker
+    build: ./web_app/docker
     ports:
-      - "3000:3000"
+      - "4200:4200"
     volumes:
       - "./:/project"
     tty: true
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo_data:/data/db
